@@ -4,7 +4,7 @@ module DataUtil
     @redis_cli = obj
   end
 
-  def self.get_data_from_redis(id, app_name)
+  def self.get_data_from_redis(id:, app_name:)
     key  = id.nil? ? "#{app_name}*" : "#{app_name}:#{id}"
     keys = @redis_cli.keys key
     raise "Data not available for #{app_name}!" if keys.empty?

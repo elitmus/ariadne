@@ -21,7 +21,7 @@ class AriadneTest < MiniTest::Test
     }
 
     Ariadne.insert_data(data)
-    out = Ariadne.get_data(nil, app_name)
+    out = Ariadne.get_data(app_name: app_name)
     assert_equal JSON.parse(out[0])['id'], data[:id]
   end
 
@@ -34,7 +34,7 @@ class AriadneTest < MiniTest::Test
     }
 
     Ariadne.insert_data(data)
-    out = Ariadne.get_data_with_time_difference(nil, app_name)
+    out = Ariadne.get_data_with_time_difference(app_name: app_name)
     assert_empty JSON.parse(out)
   end
 
@@ -50,7 +50,7 @@ class AriadneTest < MiniTest::Test
 
     Ariadne.insert_data(data)
     sleep delay_interval
-    out = Ariadne.get_data_with_time_difference(nil, app_name)
+    out = Ariadne.get_data_with_time_difference(app_name: app_name)
     assert_equal JSON.parse(out)[0]['id'], data[:id]
   end
 
@@ -63,7 +63,7 @@ class AriadneTest < MiniTest::Test
     }
 
     Ariadne.insert_data(data)
-    out = Ariadne.get_data(data[:id], app_name)
+    out = Ariadne.get_data(id: data[:id], app_name: app_name)
     assert_equal JSON.parse(out[0])['id'], data[:id]
   end
 
@@ -76,7 +76,7 @@ class AriadneTest < MiniTest::Test
     }
 
     Ariadne.insert_data(data)
-    out = Ariadne.get_data_with_time_difference(data[:id], app_name)
+    out = Ariadne.get_data_with_time_difference(id: data[:id],app_name: app_name)
     assert_empty JSON.parse(out)
   end
 
@@ -92,7 +92,7 @@ class AriadneTest < MiniTest::Test
 
     Ariadne.insert_data(data)
     sleep delay_interval
-    out = Ariadne.get_data_with_time_difference(data[:id], app_name)
+    out = Ariadne.get_data_with_time_difference(id: data[:id], app_name: app_name)
     assert_equal JSON.parse(out)[0]['id'], data[:id]
   end
 end
