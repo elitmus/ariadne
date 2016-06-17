@@ -15,10 +15,9 @@ module Ariadne
 
   def self.insert_data(options = {})
     options[:id] ||= options['id']
-    options[:app_name] ||= options['app_name']
     raise 'Please specify data to be inserted for Ariadne.insert_data method!' if options.size <= 0
     raise 'Please specify id to be passed for Ariadne.insert_data method!' if options[:id].nil? || options[:id].size <= 0
-    DataUtil.insert_data_in_redis(options.merge!(app_name: get_app_name(app_name: options[:app_name])))
+    DataUtil.insert_data_in_redis(options)
   rescue StandardError => e
     puts e
     e
