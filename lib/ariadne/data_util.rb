@@ -1,10 +1,10 @@
 
 module DataUtil
-  def self.init_redis_cli(obj = nil)
-    @redis_cli = obj
+  def self.init_redis_cli(redis_obj: nil)
+    @redis_cli = redis_obj
   end
 
-  def self.get_data_from_redis(id, app_name)
+  def self.get_data_from_redis(id:, app_name:)
     key  = id.nil? ? "#{app_name}*" : "#{app_name}:#{id}"
     keys = @redis_cli.keys key
     raise "Data not available for #{app_name}!" if keys.empty?
@@ -15,8 +15,8 @@ module DataUtil
     puts e
   end
 
-  def self.insert_data_in_redis(options = {})
-    key = "#{options[:app_name]}:#{options[:id]}"
+  def self.insert_data_in_redis(options:, app_name:)
+    key = "#{app_name}:#{options[:id]}"
     options[:time] = Time.now
     redis_data = nil
     @redis_cli.pipelined do
