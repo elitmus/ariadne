@@ -41,7 +41,7 @@ DEPENDENCIES
   ariadne!
   bundler
   codeclimate-test-reporter
-  minitest (~> 5.0)
+  minitest
   pry-byebug
   rake
   simplecov
