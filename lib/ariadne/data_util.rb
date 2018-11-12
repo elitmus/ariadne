@@ -5,7 +5,8 @@ module DataUtil
     raise "Redis object not found!" if redis_obj.nil?
     @redis_cli = redis_obj
   rescue StandardError => e
-    puts e
+    Rails.logger.warn "#{e}"
+    nil
   end
 
   # => id: get data for for given id
@@ -19,7 +20,8 @@ module DataUtil
     redis_data = (@redis_cli.mget keys)
     redis_data
   rescue StandardError => e
-    puts e
+    Rails.logger.warn "#{e}"
+    nil
   end
 
   # => options: specify the data to be inserted in redis
