@@ -3,7 +3,7 @@ require 'json'
 require 'time'
 require 'redis'
 require 'redis/connection/hiredis'
-
+require 'ariadne/exceptions'
 # This module acts as an iterface to the redis db
 # It will store the data that is being passed to the redis database.
 # In addition it will also store Timestamp info as its purpose is
@@ -11,14 +11,18 @@ require 'redis/connection/hiredis'
 # This module closely works with the rails app and uses its
 #   environment params.
 module Ariadne
+  include CustomExceptions
   # Get the current application name for which
   #   the data needs to be stored.
   # This app_name will serve the purpose of generating unique keys
   #   for each different app.
   def self.get_app_name(app_name: nil)
-    app_name ||= ( ENV['APP_NAME'] || '' )
-  rescue StandardError => e
-    puts "Can't connect to the Redis databse! Object Undefined!"
+    begin
+      app_name ||= ( ENV['APP_NAME'] || '' )
+    rescue StandardError => e
+      Ariadne.logger.error "Can't connect to the Redis databse! Object Undefined!"
+      return nil
+    end
   end
 
   DataUtil.init_redis_cli(redis_obj: Redis.new(url: ENV['REDIS_URL']))
@@ -27,21 +31,31 @@ module Ariadne
   #     this hash must contain the `id` parameter
   # => app_name: custom app_name if not stored in the ENV of rails app
   def self.insert_data(options: {}, app_name: nil)
-    raise 'Please specify data to be inserted for Ariadne.insert_data method!' if options.empty?
-    raise 'Please specify id to be passed for Ariadne.insert_data method!' if options['id'].nil? || options['id'].size == 0
-    DataUtil.insert_data_in_redis(options: options, app_name: get_app_name(app_name: app_name))
-  rescue StandardError => e
-    puts e
-    e
+    begin
+      raise DataNotAvailable.new(),'Please specify data to be inserted for Ariadne.insert_data method!' if options.empty?
+      raise IDNotAvailable.new(),'Please specify id to be passed for Ariadne.insert_data method!' if options['id'].nil? || options['id'].size == 0
+      DataUtil.insert_data_in_redis(options: options, app_name: get_app_name(app_name: app_name))
+    rescue DataNotAvailable => e
+      Ariadne.logger.info "#{e}"
+      return e
+    rescue IDNotAvailable => e
+      Ariadne.logger.info "#{e}"
+      return e
+    rescue StandardError => e
+      Ariadne.logger.error "#{e}"
+      return e
+    end
   end
 
   # => id: id for which the data is needed to be retirvied from db
   # This method will return data as a JSON string
   def self.get_data(id: nil, app_name: nil)
-    DataUtil.get_data_from_redis(id: id, app_name: get_app_name(app_name: app_name))
-  rescue StandardError => e
-    puts e
-    e
+    begin
+      DataUtil.get_data_from_redis(id: id, app_name: get_app_name(app_name: app_name))
+    rescue StandardError => e
+      Ariadne.logger.error "#{e}"
+      return e
+    end
   end
 
   # This method will return the data only if the time difference is more than
