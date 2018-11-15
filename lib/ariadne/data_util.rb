@@ -1,25 +1,39 @@
 # This module will work with the data operations on redis database
+require 'ariadne/exceptions'
 module DataUtil
+  include CustomExceptions
   # initialize the `redis` database connection object
   def self.init_redis_cli(redis_obj: nil)
-    raise "Redis object not found!" if redis_obj.nil?
-    @redis_cli = redis_obj
-  rescue StandardError => e
-    puts e
+    begin
+      raise RedisObjectNotAvailable.new(),"Redis object not found!" if redis_obj.nil?
+      @redis_cli = redis_obj
+    rescue RedisObjectNotAvailable => e
+      Ariadne.logger.info "#{e}"
+      return nil
+    rescue StandardError => e
+      Ariadne.logger.error "#{e}"
+      return nil
+    end
   end
 
   # => id: get data for for given id
   #    if the id isn't specified it will fetch all data
   #    for a current app.
   def self.get_data_from_redis(id:, app_name:)
-    key  = id.nil? ? "#{app_name}*" : "#{app_name}:#{id}"
-    keys = @redis_cli.keys key
-    raise "Data not available for #{app_name}!" if keys.empty?
-    keys.compact!
-    redis_data = (@redis_cli.mget keys)
-    redis_data
-  rescue StandardError => e
-    puts e
+    begin
+      key  = id.nil? ? "#{app_name}*" : "#{app_name}:#{id}"
+      keys = @redis_cli.keys key
+      raise AppDataNotAvailable.new(),"Data not available for #{app_name}!" if keys.empty?
+      keys.compact!
+      redis_data = (@redis_cli.mget keys)
+      redis_data
+    rescue AppDataNotAvailable => e
+      Ariadne.logger.info "#{e}"
+      return nil
+    rescue StandardError => e
+      Ariadne.logger.error "#{e}"
+      return nil
+    end
   end
 
   # => options: specify the data to be inserted in redis
