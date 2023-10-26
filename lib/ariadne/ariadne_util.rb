@@ -29,6 +29,7 @@ module Ariadne
   def self.insert_data(options: {}, app_name: nil)
     raise 'Please specify data to be inserted for Ariadne.insert_data method!' if options.empty?
     raise 'Please specify id to be passed for Ariadne.insert_data method!' if options['id'].nil? || options['id'].size == 0
+
     DataUtil.insert_data_in_redis(options: options, app_name: get_app_name(app_name: app_name))
   rescue StandardError => e
     puts e
